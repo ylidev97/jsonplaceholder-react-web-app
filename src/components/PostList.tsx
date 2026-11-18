@@ -61,7 +61,7 @@ export default function PostList({ userId, authorName, onWrite }: PostListProps)
               </span>
             )}
             <h3 className="text-2xl leading-[1.15] text-pretty">{capitalize(post.title)}</h3>
-            <p className="line-clamp-2 hyphens-auto text-justify text-[14.5px] leading-relaxed text-fg/80">
+            <p className="hyphens-auto text-justify text-[14.5px] leading-relaxed text-fg/80">
               {capitalize(post.body)}
             </p>
           </li>
