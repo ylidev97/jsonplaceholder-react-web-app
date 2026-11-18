@@ -1,7 +1,12 @@
 import { useState } from 'react'
 import { useUsers } from '../hooks/useUsers'
 
-export default function UserList() {
+interface UserListProps {
+  selectedUserId: number | null
+  onSelect: (userId: number) => void
+}
+
+export default function UserList({ selectedUserId, onSelect }: UserListProps) {
   const { data: users = [] } = useUsers()
   const [search, setSearch] = useState('')
 
@@ -38,11 +43,23 @@ export default function UserList() {
         </div>
       ) : (
         <ul className="space-y-1">
-          {filtered.map((user) => (
-            <li key={user.id} className="rounded px-3 py-2">
-              {user.name}
-            </li>
-          ))}
+          {filtered.map((user) => {
+            const selected = user.id === selectedUserId
+            return (
+              <li key={user.id}>
+                <button
+                  type="button"
+                  aria-pressed={selected}
+                  onClick={() => onSelect(user.id)}
+                  className={`w-full rounded px-3 py-2 text-left focus:outline-2 focus:outline-blue-600 ${
+                    selected ? 'bg-blue-600 text-white' : 'hover:bg-gray-100'
+                  }`}
+                >
+                  {user.name}
+                </button>
+              </li>
+            )
+          })}
         </ul>
       )}
     </section>

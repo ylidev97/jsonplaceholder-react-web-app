@@ -12,11 +12,11 @@ const users = [
   { id: 2, name: 'Ervin Howell', username: 'Antonette', email: 'b@b.com' },
 ]
 
-function renderUserList() {
+function renderUserList(selectedUserId: number | null = null, onSelect = vi.fn()) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(
     <QueryClientProvider client={client}>
-      <UserList />
+      <UserList selectedUserId={selectedUserId} onSelect={onSelect} />
     </QueryClientProvider>,
   )
 }
@@ -47,5 +47,18 @@ describe('UserList', () => {
 
     expect(screen.getByText('Leanne Graham')).toBeInTheDocument()
     expect(screen.getByText('Ervin Howell')).toBeInTheDocument()
+  })
+
+  it('R2: highlights the selected author and reports clicks', async () => {
+    vi.mocked(getUsers).mockResolvedValue(users)
+    const onSelect = vi.fn()
+    renderUserList(2, onSelect)
+
+    expect(await screen.findByRole('button', { name: 'Ervin Howell', pressed: true })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Leanne Graham', pressed: false })).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Leanne Graham' }))
+
+    expect(onSelect).toHaveBeenCalledWith(1)
   })
 })
