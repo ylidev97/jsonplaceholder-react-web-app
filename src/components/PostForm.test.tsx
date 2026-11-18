@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -65,6 +65,41 @@ describe('PostForm', () => {
     expect(createPost).not.toHaveBeenCalled()
   })
 
+  it('R3: with only the title filled, shows the text error, focuses the text and does not call the API', async () => {
+    renderForm()
+
+    await userEvent.type(screen.getByLabelText('Título'), 'Only a title')
+    await userEvent.click(screen.getByRole('button', { name: 'Publicar' }))
+
+    expect(screen.getAllByRole('alert')).toHaveLength(1)
+    expect(screen.getByText('El texto es obligatorio')).toBeInTheDocument()
+    expect(screen.getByLabelText('Texto')).toHaveFocus()
+    expect(createPost).not.toHaveBeenCalled()
+  })
+
+  it('R3: with only the text filled, shows the title error, focuses the title and does not call the API', async () => {
+    renderForm()
+
+    await userEvent.type(screen.getByLabelText('Texto'), 'Only a body')
+    await userEvent.click(screen.getByRole('button', { name: 'Publicar' }))
+
+    expect(screen.getAllByRole('alert')).toHaveLength(1)
+    expect(screen.getByText('El título es obligatorio')).toBeInTheDocument()
+    expect(screen.getByLabelText('Título')).toHaveFocus()
+    expect(createPost).not.toHaveBeenCalled()
+  })
+
+  it('R3: a title over 100 characters is not valid', async () => {
+    renderForm()
+
+    await userEvent.type(screen.getByLabelText('Título'), 'a'.repeat(101))
+    await userEvent.type(screen.getByLabelText('Texto'), 'Some body')
+    await userEvent.click(screen.getByRole('button', { name: 'Publicar' }))
+
+    expect(screen.getByText('Usa menos de 100 caracteres')).toBeInTheDocument()
+    expect(createPost).not.toHaveBeenCalled()
+  })
+
   it('R3: errors update live while typing', async () => {
     renderForm()
 
@@ -115,6 +150,36 @@ describe('PostForm', () => {
 
     expect(screen.getByRole('button', { name: 'Publicando…' })).toBeDisabled()
     expect(screen.getByRole('button', { name: 'Cancelar' })).toBeDisabled()
+  })
+
+  it('R3: while sending, a second submit is ignored and the modal cannot be closed', async () => {
+    vi.mocked(createPost).mockReturnValue(new Promise(() => {}))
+    const { onClose } = renderForm()
+    await fillAndSubmit('A title', 'A body')
+    const dialog = screen.getByRole('dialog')
+
+    // Let any (wrongly) started request reach the API before checking.
+    await act(async () => {
+      fireEvent.submit(dialog)
+      fireEvent.keyDown(dialog, { key: 'Escape' })
+      fireEvent.click(dialog.parentElement!)
+    })
+
+    expect(createPost).toHaveBeenCalledTimes(1)
+    expect(onClose).not.toHaveBeenCalled()
+  })
+
+  it('R3: clicking the backdrop closes the modal, but clicking inside does not', async () => {
+    const { onClose } = renderForm()
+    const dialog = screen.getByRole('dialog')
+
+    await userEvent.click(screen.getByLabelText('Título'))
+
+    expect(onClose).not.toHaveBeenCalled()
+
+    await userEvent.click(dialog.parentElement!)
+
+    expect(onClose).toHaveBeenCalledTimes(1)
   })
 
   it('R3: creating several posts gives each one a unique id', async () => {

@@ -38,6 +38,17 @@ describe('UserList', () => {
     expect(screen.queryByText('Ervin Howell')).not.toBeInTheDocument()
   })
 
+  it('R1: the search ignores upper and lower case', async () => {
+    vi.mocked(getUsers).mockResolvedValue(users)
+    renderUserList()
+    await screen.findByText('Ervin Howell')
+
+    await userEvent.type(screen.getByLabelText('Buscar autor'), 'LEANNE')
+
+    expect(screen.getByText('Leanne Graham')).toBeInTheDocument()
+    expect(screen.queryByText('Ervin Howell')).not.toBeInTheDocument()
+  })
+
   it('shows the no-match message and "Borrar búsqueda" restores the list', async () => {
     vi.mocked(getUsers).mockResolvedValue(users)
     renderUserList()
