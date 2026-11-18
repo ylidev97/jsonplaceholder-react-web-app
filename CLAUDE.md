@@ -27,7 +27,8 @@ Guidance for Claude Code in this repo: React + TS technical test using the JSONP
 - `src/api`: HTTP calls with axios
 - `src/types`: User, Post, NewPost
 - `src/hooks`: useUsers, usePosts, useCreatePost
-- `src/components`: Header, UserList, AuthorHeader, PostList, PostForm (dialog modal), StatusMessage
+- `src/components`: Header, UserList, AuthorHeader, PostList, PostForm (dialog modal), StatusMessage, Toast, Icons (inline SVG), styles.ts
+- `src/utils`: capitalize, initials
 - `App.tsx`: layout and `selectedUserId` in `useState` (no Context or Redux)
 - Tests next to the component: `Component.test.tsx`
 

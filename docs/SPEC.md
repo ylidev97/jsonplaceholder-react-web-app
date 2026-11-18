@@ -41,6 +41,14 @@ API: https://jsonplaceholder.typicode.com (el POST no guarda los datos de verdad
 - Sin autor elegido: "Elige un autor" con la indicación de seleccionar a alguien de la lista.
 - Autor sin publicaciones: "Aún no hay publicaciones", "{nombre} no ha publicado nada." y un botón "Escribir la primera publicación".
 
+### R8 — Diseño "Classical" (extras del rediseño)
+- Cada autor muestra sus iniciales, su email y, en la lista, un contador ("10 autores", o "2 de 10" al buscar).
+- La cabecera del autor muestra su nombre, su email y cuántas publicaciones tiene, con el botón "Nueva publicación".
+- El formulario (R3) se abre en un modal, que se cierra con Escape, con "Cancelar" o con la X. Los errores se actualizan mientras se escribe y hay contadores de caracteres del título (máximo 100) y de palabras del texto.
+- Al publicar, el modal se cierra, aparece el aviso "Publicación creada" y la publicación nueva lleva la etiqueta "Recién publicada".
+- En móvil se ve una pantalla a la vez: la lista de autores, o las publicaciones del autor elegido con un botón "Autores" para volver.
+- La carga se muestra con esqueletos que imitan la lista final.
+
 ## Criterios de aceptación → tests
 - [ ] AC1: escribir "leanne" muestra solo a Leanne Graham (R1)
 - [ ] AC2: enviar el formulario vacío muestra 2 errores y no llama a la API (R3)
