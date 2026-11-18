@@ -83,4 +83,65 @@ describe('PostList', () => {
 
     expect(onWrite).toHaveBeenCalledTimes(1)
   })
+
+  describe('R6: show more posts', () => {
+    const manyPosts = (userId: number, count: number) =>
+      Array.from({ length: count }, (_, i) => ({
+        id: userId * 100 + i,
+        userId,
+        title: `Post ${userId}-${i + 1}`,
+        body: 'Body',
+      }))
+
+    it('R6: shows 4 posts by default and "Mostrar más" reveals the rest', async () => {
+      vi.mocked(getPostsByUser).mockResolvedValue(manyPosts(1, 5))
+      renderPostList(1)
+
+      expect(await screen.findAllByRole('heading', { level: 3 })).toHaveLength(4)
+
+      await userEvent.click(screen.getByRole('button', { name: 'Mostrar más' }))
+
+      expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(5)
+      expect(screen.getByRole('button', { name: 'Mostrar menos' })).toBeInTheDocument()
+    })
+
+    it('R6: "Mostrar menos" goes back to 4 posts', async () => {
+      vi.mocked(getPostsByUser).mockResolvedValue(manyPosts(1, 6))
+      renderPostList(1)
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Mostrar más' }))
+      await userEvent.click(screen.getByRole('button', { name: 'Mostrar menos' }))
+
+      expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(4)
+      expect(screen.getByRole('button', { name: 'Mostrar más' })).toBeInTheDocument()
+    })
+
+    it('R6: there is no button with 4 posts or fewer', async () => {
+      vi.mocked(getPostsByUser).mockResolvedValue(manyPosts(1, 4))
+      renderPostList(1)
+
+      expect(await screen.findAllByRole('heading', { level: 3 })).toHaveLength(4)
+      expect(screen.queryByRole('button', { name: /Mostrar/ })).not.toBeInTheDocument()
+    })
+
+    it('R6: choosing another author goes back to 4 posts', async () => {
+      vi.mocked(getPostsByUser).mockImplementation(async (userId) => manyPosts(userId, 6))
+      const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+      const ui = (userId: number) => (
+        <QueryClientProvider client={client}>
+          <PostList userId={userId} authorName="Author" onWrite={vi.fn()} />
+        </QueryClientProvider>
+      )
+      const { rerender } = render(ui(1))
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Mostrar más' }))
+      expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(6)
+
+      rerender(ui(2))
+
+      expect(await screen.findByText('Post 2-1')).toBeInTheDocument()
+      expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(4)
+      expect(screen.getByRole('button', { name: 'Mostrar más' })).toBeInTheDocument()
+    })
+  })
 })

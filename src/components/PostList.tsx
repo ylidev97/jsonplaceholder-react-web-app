@@ -1,6 +1,9 @@
+import { useState } from 'react'
 import { usePosts } from '../hooks/usePosts'
 import { capitalize } from '../utils/capitalize'
 import StatusMessage from './StatusMessage'
+
+const VISIBLE_POSTS = 4
 
 interface PostListProps {
   userId: number | null
@@ -10,6 +13,8 @@ interface PostListProps {
 
 export default function PostList({ userId, authorName, onWrite }: PostListProps) {
   const { data: posts = [], isPending, isError, refetch } = usePosts(userId)
+  // Remember which author is expanded, so choosing another author goes back to 4 posts.
+  const [expandedUserId, setExpandedUserId] = useState<number | null>(null)
 
   if (userId === null) return null
 
@@ -41,16 +46,30 @@ export default function PostList({ userId, authorName, onWrite }: PostListProps)
     )
   }
 
+  const expanded = expandedUserId === userId
+  const visiblePosts = expanded ? posts : posts.slice(0, VISIBLE_POSTS)
+
   return (
     <section className="p-4">
       <ul className="space-y-4">
-        {posts.map((post) => (
+        {visiblePosts.map((post) => (
           <li key={post.id}>
             <h3 className="font-semibold">{capitalize(post.title)}</h3>
             <p className="text-muted">{capitalize(post.body)}</p>
           </li>
         ))}
       </ul>
+
+      {posts.length > VISIBLE_POSTS && (
+        <button
+          type="button"
+          aria-expanded={expanded}
+          onClick={() => setExpandedUserId(expanded ? null : userId)}
+          className="mt-4 rounded border border-line px-4 py-2 hover:bg-hover focus:outline-2 focus:outline-accent"
+        >
+          {expanded ? 'Mostrar menos' : 'Mostrar más'}
+        </button>
+      )}
     </section>
   )
 }
