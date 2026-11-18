@@ -1,11 +1,11 @@
-import './App.css'
+import UserList from './components/UserList'
 
 function App() {
-
   return (
-    <>
-    <h1>MyEditorial</h1>
-    </>
+    <main>
+      <h1 className="p-4 text-3xl font-semibold">MyEditorial</h1>
+      <UserList />
+    </main>
   )
 }
 
