@@ -25,14 +25,14 @@ describe('Header', () => {
     render(<Header />)
 
     expect(document.documentElement).toHaveClass('dark')
-    expect(screen.getByRole('button', { name: 'Modo claro' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Cambiar a modo claro' })).toBeInTheDocument()
   })
 
   it('R5: without a saved theme, uses the system preference (light)', () => {
     render(<Header />)
 
     expect(document.documentElement).not.toHaveClass('dark')
-    expect(screen.getByRole('button', { name: 'Modo oscuro' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Cambiar a modo oscuro' })).toBeInTheDocument()
   })
 
   it('R5: a saved theme wins over the system preference', () => {
@@ -46,12 +46,12 @@ describe('Header', () => {
   it('R5: the button toggles the theme and saves it in localStorage', async () => {
     render(<Header />)
 
-    await userEvent.click(screen.getByRole('button', { name: 'Modo oscuro' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Cambiar a modo oscuro' }))
 
     expect(document.documentElement).toHaveClass('dark')
     expect(localStorage.getItem('theme')).toBe('dark')
 
-    await userEvent.click(screen.getByRole('button', { name: 'Modo claro' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Cambiar a modo claro' }))
 
     expect(document.documentElement).not.toHaveClass('dark')
     expect(localStorage.getItem('theme')).toBe('light')
@@ -59,12 +59,24 @@ describe('Header', () => {
 
   it('R5: the chosen theme is restored after a reload', async () => {
     const { unmount } = render(<Header />)
-    await userEvent.click(screen.getByRole('button', { name: 'Modo oscuro' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Cambiar a modo oscuro' }))
     unmount()
     document.documentElement.classList.remove('dark')
 
     render(<Header />)
 
     expect(document.documentElement).toHaveClass('dark')
+  })
+
+  it('R5: shows a back button only when onBack is given', async () => {
+    const onBack = vi.fn()
+    const { rerender } = render(<Header />)
+
+    expect(screen.queryByRole('button', { name: 'Volver a autores' })).not.toBeInTheDocument()
+
+    rerender(<Header onBack={onBack} />)
+    await userEvent.click(screen.getByRole('button', { name: 'Volver a autores' }))
+
+    expect(onBack).toHaveBeenCalledTimes(1)
   })
 })
