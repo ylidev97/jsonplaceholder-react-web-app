@@ -14,7 +14,7 @@ export function useCreatePost() {
       queryClient.setQueryData<Post[]>(['posts', variables.userId], (old = []) => {
         const idTaken = old.some((post) => post.id === created.id)
         const id = idTaken ? Math.max(...old.map((post) => post.id)) + 1 : created.id
-        return [{ ...created, id }, ...old]
+        return [{ ...created, id, isNew: true }, ...old]
       })
     },
   })
