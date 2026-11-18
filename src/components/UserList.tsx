@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useUsers } from '../hooks/useUsers'
+import StatusMessage from './StatusMessage'
 
 interface UserListProps {
   selectedUserId: number | null
@@ -7,8 +8,28 @@ interface UserListProps {
 }
 
 export default function UserList({ selectedUserId, onSelect }: UserListProps) {
-  const { data: users = [] } = useUsers()
+  const { data: users = [], isPending, isError, refetch } = useUsers()
   const [search, setSearch] = useState('')
+
+  if (isPending) return <StatusMessage type="loading" message="Cargando autores…" />
+
+  if (isError) {
+    return (
+      <StatusMessage
+        type="error"
+        message="No se pudieron cargar los autores"
+        onRetry={() => refetch()}
+      />
+    )
+  }
+
+  if (users.length === 0) {
+    return (
+      <p role="status" className="p-4 text-gray-600">
+        No hay autores disponibles
+      </p>
+    )
+  }
 
   const term = search.trim().toLowerCase()
   const filtered = users.filter((user) => user.name.toLowerCase().includes(term))

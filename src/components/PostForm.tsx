@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useCreatePost } from '../hooks/useCreatePost'
+import StatusMessage from './StatusMessage'
 
 interface PostFormProps {
   userId: number | null
@@ -13,7 +14,7 @@ export default function PostForm({ userId }: PostFormProps) {
   const [body, setBody] = useState('')
   const [titleError, setTitleError] = useState('')
   const [bodyError, setBodyError] = useState('')
-  const { mutate, isPending } = useCreatePost()
+  const { mutate, isPending, isError } = useCreatePost()
 
   if (userId === null) return null
 
@@ -26,6 +27,10 @@ export default function PostForm({ userId }: PostFormProps) {
     setBodyError(newBody ? '' : 'El texto es obligatorio')
     if (!newTitle || !newBody) return
 
+    send(newTitle, newBody)
+  }
+
+  function send(newTitle: string, newBody: string) {
     mutate(
       { userId: userId!, title: newTitle, body: newBody },
       {
@@ -83,8 +88,16 @@ export default function PostForm({ userId }: PostFormProps) {
         disabled={isPending}
         className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:outline-2 focus:outline-offset-2 focus:outline-blue-600 disabled:opacity-50"
       >
-        Publicar
+        {isPending ? 'Publicando…' : 'Publicar'}
       </button>
+
+      {isError && (
+        <StatusMessage
+          type="error"
+          message="No se pudo publicar"
+          onRetry={() => send(title.trim(), body.trim())}
+        />
+      )}
     </form>
   )
 }

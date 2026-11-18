@@ -1,14 +1,45 @@
 import { usePosts } from '../hooks/usePosts'
 import { capitalize } from '../utils/capitalize'
+import StatusMessage from './StatusMessage'
 
 interface PostListProps {
   userId: number | null
+  authorName: string
+  onWrite: () => void
 }
 
-export default function PostList({ userId }: PostListProps) {
-  const { data: posts = [] } = usePosts(userId)
+export default function PostList({ userId, authorName, onWrite }: PostListProps) {
+  const { data: posts = [], isPending, isError, refetch } = usePosts(userId)
 
   if (userId === null) return null
+
+  if (isPending) return <StatusMessage type="loading" message="Cargando publicaciones…" />
+
+  if (isError) {
+    return (
+      <StatusMessage
+        type="error"
+        message="No se pudieron cargar las publicaciones"
+        onRetry={() => refetch()}
+      />
+    )
+  }
+
+  if (posts.length === 0) {
+    return (
+      <section role="status" className="p-4 text-center">
+        <p className="font-semibold">Aún no hay publicaciones</p>
+        <p className="mb-3 text-sm text-gray-600">{authorName} no ha publicado nada.</p>
+        <button
+          type="button"
+          onClick={onWrite}
+          className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:outline-2 focus:outline-offset-2 focus:outline-blue-600"
+        >
+          Escribir la primera publicación
+        </button>
+      </section>
+    )
+  }
 
   return (
     <section className="p-4">

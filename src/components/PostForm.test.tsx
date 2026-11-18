@@ -14,7 +14,7 @@ function renderForm(client = new QueryClient({ defaultOptions: { queries: { retr
   return render(
     <QueryClientProvider client={client}>
       <PostForm userId={1} />
-      <PostList userId={1} />
+      <PostList userId={1} authorName="Leanne Graham" onWrite={() => {}} />
     </QueryClientProvider>,
   )
 }
@@ -22,6 +22,8 @@ function renderForm(client = new QueryClient({ defaultOptions: { queries: { retr
 describe('PostForm', () => {
   beforeEach(() => {
     vi.mocked(createPost).mockReset()
+    vi.mocked(getPostsByUser).mockReset()
+    vi.mocked(getPostsByUser).mockResolvedValue([existing])
   })
 
   it('AC2: submitting the empty form shows 2 errors and does not call the API', async () => {
@@ -76,11 +78,10 @@ describe('PostForm', () => {
     await userEvent.type(screen.getByLabelText('Texto'), 'A body')
     await userEvent.click(screen.getByRole('button', { name: 'Publicar' }))
 
-    expect(screen.getByRole('button', { name: 'Publicar' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Publicando…' })).toBeDisabled()
   })
 
   it('R3: creating several posts gives each one a unique id', async () => {
-    vi.mocked(getPostsByUser).mockResolvedValue([existing])
     vi.mocked(createPost).mockImplementation(async (post) => ({ id: 101, ...post }))
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
@@ -98,5 +99,25 @@ describe('PostForm', () => {
     expect(new Set(ids).size).toBe(ids.length)
     expect(errorSpy).not.toHaveBeenCalled()
     errorSpy.mockRestore()
+  })
+
+  it('R4: if sending fails, shows an error and "Reintentar" sends the same post again', async () => {
+    vi.mocked(createPost)
+      .mockRejectedValueOnce(new Error('Network Error'))
+      .mockResolvedValueOnce({ id: 101, userId: 1, title: 'New title', body: 'New body' })
+    renderForm()
+
+    await userEvent.type(screen.getByLabelText('Título'), 'New title')
+    await userEvent.type(screen.getByLabelText('Texto'), 'New body')
+    await userEvent.click(screen.getByRole('button', { name: 'Publicar' }))
+
+    expect(await screen.findByText('No se pudo publicar')).toBeInTheDocument()
+    expect(screen.getByLabelText('Título')).toHaveValue('New title')
+
+    await userEvent.click(screen.getByRole('button', { name: 'Reintentar' }))
+
+    expect(await screen.findByRole('heading', { name: 'New title' })).toBeInTheDocument()
+    expect(createPost).toHaveBeenCalledTimes(2)
+    expect(screen.getByLabelText('Título')).toHaveValue('')
   })
 })

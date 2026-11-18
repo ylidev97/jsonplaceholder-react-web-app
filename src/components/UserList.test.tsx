@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import UserList from './UserList'
 import { getUsers } from '../api/users'
 
@@ -22,6 +22,10 @@ function renderUserList(selectedUserId: number | null = null, onSelect = vi.fn()
 }
 
 describe('UserList', () => {
+  beforeEach(() => {
+    vi.mocked(getUsers).mockReset()
+  })
+
   it('AC1: typing "leanne" shows only Leanne Graham', async () => {
     vi.mocked(getUsers).mockResolvedValue(users)
     renderUserList()
@@ -60,5 +64,37 @@ describe('UserList', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Leanne Graham' }))
 
     expect(onSelect).toHaveBeenCalledWith(1)
+  })
+
+  it('AC3: if GET /users fails, the error message is shown', async () => {
+    vi.mocked(getUsers).mockRejectedValue(new Error('Network Error'))
+    renderUserList()
+
+    expect(await screen.findByText('No se pudieron cargar los autores')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Reintentar' })).toBeInTheDocument()
+  })
+
+  it('R4: "Reintentar" requests the authors again', async () => {
+    vi.mocked(getUsers).mockRejectedValueOnce(new Error('Network Error')).mockResolvedValueOnce(users)
+    renderUserList()
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Reintentar' }))
+
+    expect(await screen.findByText('Leanne Graham')).toBeInTheDocument()
+    expect(getUsers).toHaveBeenCalledTimes(2)
+  })
+
+  it('R4: shows a loading message while waiting', () => {
+    vi.mocked(getUsers).mockReturnValue(new Promise(() => {}))
+    renderUserList()
+
+    expect(screen.getByText('Cargando autores…')).toBeInTheDocument()
+  })
+
+  it('R7: shows an empty state when there are no authors', async () => {
+    vi.mocked(getUsers).mockResolvedValue([])
+    renderUserList()
+
+    expect(await screen.findByText('No hay autores disponibles')).toBeInTheDocument()
   })
 })
