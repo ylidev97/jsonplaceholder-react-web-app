@@ -58,10 +58,10 @@ describe('UserList', () => {
     const onSelect = vi.fn()
     renderUserList(2, onSelect)
 
-    expect(await screen.findByRole('button', { name: 'Ervin Howell', pressed: true })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Leanne Graham', pressed: false })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: /Ervin Howell/, pressed: true })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Leanne Graham/, pressed: false })).toBeInTheDocument()
 
-    await userEvent.click(screen.getByRole('button', { name: 'Leanne Graham' }))
+    await userEvent.click(screen.getByRole('button', { name: /Leanne Graham/ }))
 
     expect(onSelect).toHaveBeenCalledWith(1)
   })
@@ -96,5 +96,30 @@ describe('UserList', () => {
     renderUserList()
 
     expect(await screen.findByText('No hay autores disponibles')).toBeInTheDocument()
+  })
+
+  it('shows the email, initials and the authors count', async () => {
+    vi.mocked(getUsers).mockResolvedValue(users)
+    renderUserList()
+
+    expect(await screen.findByText('a@a.com')).toBeInTheDocument()
+    expect(screen.getByText('LG')).toBeInTheDocument()
+    expect(screen.getByText('2 autores')).toBeInTheDocument()
+
+    await userEvent.type(screen.getByLabelText('Buscar autor'), 'leanne')
+
+    expect(screen.getByText('1 de 2')).toBeInTheDocument()
+  })
+
+  it('clears the search with the clear button inside the field', async () => {
+    vi.mocked(getUsers).mockResolvedValue(users)
+    renderUserList()
+    await screen.findByText('Leanne Graham')
+
+    await userEvent.type(screen.getByLabelText('Buscar autor'), 'zelda')
+    await userEvent.click(screen.getByRole('button', { name: 'Limpiar búsqueda' }))
+
+    expect(screen.getByLabelText('Buscar autor')).toHaveValue('')
+    expect(screen.getByText('Ervin Howell')).toBeInTheDocument()
   })
 })
