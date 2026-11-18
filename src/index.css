@@ -1,45 +1,71 @@
 @import "tailwindcss";
 
-/* Theme tokens: light by default, overridden when <html> has the "dark" class. */
+/* "Classical" theme tokens: light by default, overridden when <html> has the "dark" class.
+   --accent is for strokes and icons; --accent-strong is the accessible shade for accent text. */
 :root {
-  --bg: #ffffff;
-  --fg: #111827;
-  --muted: #4b5563;
-  --line: #d1d5db;
-  --hover: #f3f4f6;
-  --accent: #2563eb;
-  --accent-hover: #1d4ed8;
-  --accent-fg: #ffffff;
-  --danger: #dc2626;
+  --bg: #f3f2f2;
+  --surface: #eae9e9;
+  --fg: #201f1d;
+  --muted: #5f5c58;
+  --line: color-mix(in srgb, #201f1d 16%, transparent);
+  --accent: #b68235;
+  --accent-strong: #7d5411;
+  --danger: oklch(0.5 0.16 28);
   color-scheme: light;
 }
 
 .dark {
-  --bg: #16171d;
-  --fg: #f3f4f6;
-  --muted: #9ca3af;
-  --line: #2e303a;
-  --hover: #1f2028;
-  --accent: #60a5fa;
-  --accent-hover: #93c5fd;
-  --accent-fg: #0b1220;
-  --danger: #f87171;
+  --bg: #191817;
+  --surface: #232120;
+  --fg: #ece8e3;
+  --muted: #a9a39b;
+  --line: color-mix(in srgb, #ece8e3 16%, transparent);
+  --accent: #d6a560;
+  --accent-strong: #facb8d;
+  --danger: oklch(0.74 0.13 28);
   color-scheme: dark;
 }
 
 @theme inline {
   --color-page: var(--bg);
+  --color-surface: var(--surface);
   --color-fg: var(--fg);
   --color-muted: var(--muted);
   --color-line: var(--line);
-  --color-hover: var(--hover);
   --color-accent: var(--accent);
-  --color-accent-hover: var(--accent-hover);
-  --color-accent-fg: var(--accent-fg);
+  --color-accent-strong: var(--accent-strong);
   --color-danger: var(--danger);
 }
 
-body {
-  background-color: var(--bg);
-  color: var(--fg);
+@theme {
+  --font-sans: "Lora", system-ui, sans-serif;
+  --font-heading: "Cormorant Garamond", system-ui, sans-serif;
+}
+
+@layer base {
+  body {
+    background-color: var(--bg);
+    color: var(--fg);
+    font-size: 15px;
+    line-height: 1.55;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    line-height: 1.12;
+    letter-spacing: -0.015em;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--accent) 30%, transparent);
+  }
 }
