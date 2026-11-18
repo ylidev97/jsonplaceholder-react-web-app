@@ -20,4 +20,16 @@ describe('StatusMessage', () => {
 
     expect(onRetry).toHaveBeenCalledTimes(1)
   })
+
+  it('R4: shows the optional description of an error', () => {
+    render(<StatusMessage type="error" message="Falló" description="Inténtalo de nuevo" onRetry={vi.fn()} />)
+
+    expect(screen.getByText('Inténtalo de nuevo')).toBeInTheDocument()
+  })
+
+  it('R4: the loading skeleton does not add text to the status message', () => {
+    render(<StatusMessage type="loading" skeleton="authors" message="Cargando autores…" />)
+
+    expect(screen.getByRole('status')).toHaveTextContent(/^Cargando autores…$/)
+  })
 })
