@@ -84,6 +84,16 @@ describe('PostList', () => {
     expect(onWrite).toHaveBeenCalledTimes(1)
   })
 
+  it('shows the "Recién publicada" tag only on new posts', async () => {
+    vi.mocked(getPostsByUser).mockResolvedValue([
+      { id: 2, userId: 1, title: 'Fresh', body: 'Body', isNew: true },
+      { id: 1, userId: 1, title: 'Old', body: 'Body' },
+    ])
+    renderPostList(1)
+
+    expect(await screen.findAllByText('Recién publicada')).toHaveLength(1)
+  })
+
   describe('R6: show more posts', () => {
     const manyPosts = (userId: number, count: number) =>
       Array.from({ length: count }, (_, i) => ({

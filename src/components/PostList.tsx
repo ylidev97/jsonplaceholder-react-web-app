@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { usePosts } from '../hooks/usePosts'
 import { capitalize } from '../utils/capitalize'
+import { ChevronDownIcon } from './Icons'
 import StatusMessage from './StatusMessage'
+import { btnPrimary, btnSecondary } from './styles'
 
 const VISIBLE_POSTS = 4
 
@@ -18,13 +20,16 @@ export default function PostList({ userId, authorName, onWrite }: PostListProps)
 
   if (userId === null) return null
 
-  if (isPending) return <StatusMessage type="loading" message="Cargando publicaciones…" />
+  if (isPending) {
+    return <StatusMessage type="loading" skeleton="posts" message="Cargando publicaciones…" />
+  }
 
   if (isError) {
     return (
       <StatusMessage
         type="error"
         message="No se pudieron cargar las publicaciones"
+        description="El servidor no respondió a tiempo."
         onRetry={() => refetch()}
       />
     )
@@ -32,17 +37,13 @@ export default function PostList({ userId, authorName, onWrite }: PostListProps)
 
   if (posts.length === 0) {
     return (
-      <section role="status" className="p-4 text-center">
-        <p className="font-semibold">Aún no hay publicaciones</p>
-        <p className="mb-3 text-sm text-muted">{authorName} no ha publicado nada.</p>
-        <button
-          type="button"
-          onClick={onWrite}
-          className="rounded bg-accent px-4 py-2 text-accent-fg hover:bg-accent-hover focus:outline-2 focus:outline-offset-2 focus:outline-accent"
-        >
+      <div role="status" className="flex flex-col items-center gap-2 py-12 text-center">
+        <p className="font-heading text-[26px] italic">Aún no hay publicaciones</p>
+        <p className="text-sm text-muted">{authorName} no ha publicado nada.</p>
+        <button type="button" onClick={onWrite} className={`${btnPrimary} mt-2.5 min-h-11`}>
           Escribir la primera publicación
         </button>
-      </section>
+      </div>
     )
   }
 
@@ -50,26 +51,36 @@ export default function PostList({ userId, authorName, onWrite }: PostListProps)
   const visiblePosts = expanded ? posts : posts.slice(0, VISIBLE_POSTS)
 
   return (
-    <section className="p-4">
-      <ul className="space-y-4">
+    <div>
+      <ul>
         {visiblePosts.map((post) => (
-          <li key={post.id}>
-            <h3 className="font-semibold">{capitalize(post.title)}</h3>
-            <p className="text-muted">{capitalize(post.body)}</p>
+          <li key={post.id} className="flex flex-col gap-1.5 border-b border-line py-5.5">
+            {post.isNew && (
+              <span className="self-start rounded-[3px] bg-accent/15 px-2.5 py-0.5 text-[11px] tracking-wide text-accent-strong">
+                Recién publicada
+              </span>
+            )}
+            <h3 className="text-2xl leading-[1.15] text-pretty">{capitalize(post.title)}</h3>
+            <p className="line-clamp-2 hyphens-auto text-justify text-[14.5px] leading-relaxed text-fg/80">
+              {capitalize(post.body)}
+            </p>
           </li>
         ))}
       </ul>
 
       {posts.length > VISIBLE_POSTS && (
-        <button
-          type="button"
-          aria-expanded={expanded}
-          onClick={() => setExpandedUserId(expanded ? null : userId)}
-          className="mt-4 rounded border border-line px-4 py-2 hover:bg-hover focus:outline-2 focus:outline-accent"
-        >
-          {expanded ? 'Mostrar menos' : 'Mostrar más'}
-        </button>
+        <div className="flex justify-center pt-5">
+          <button
+            type="button"
+            aria-expanded={expanded}
+            onClick={() => setExpandedUserId(expanded ? null : userId)}
+            className={`${btnSecondary} min-h-11 px-5`}
+          >
+            {expanded ? 'Mostrar menos' : 'Mostrar más'}
+            <ChevronDownIcon size={16} className={expanded ? 'rotate-180' : ''} />
+          </button>
+        </div>
       )}
-    </section>
+    </div>
   )
 }
