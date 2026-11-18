@@ -2,6 +2,7 @@ import { useState } from 'react'
 import UserList from './components/UserList'
 import PostList from './components/PostList'
 import PostForm from './components/PostForm'
+import Header from './components/Header'
 import { useUsers } from './hooks/useUsers'
 
 function App() {
@@ -10,9 +11,9 @@ function App() {
   const selectedUser = users.find((user) => user.id === selectedUserId)
 
   return (
-    <main>
-      <h1 className="p-4 text-3xl font-semibold">MyEditorial</h1>
-      <div className="flex">
+    <>
+      <Header />
+      <main className="flex">
         <div className="w-1/3">
           <UserList selectedUserId={selectedUserId} onSelect={setSelectedUserId} />
         </div>
@@ -24,8 +25,8 @@ function App() {
           />
           <PostForm userId={selectedUserId} />
         </div>
-      </div>
-    </main>
+      </main>
+    </>
   )
 }
 

@@ -1,1 +1,45 @@
 @import "tailwindcss";
+
+/* Theme tokens: light by default, overridden when <html> has the "dark" class. */
+:root {
+  --bg: #ffffff;
+  --fg: #111827;
+  --muted: #4b5563;
+  --line: #d1d5db;
+  --hover: #f3f4f6;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-fg: #ffffff;
+  --danger: #dc2626;
+  color-scheme: light;
+}
+
+.dark {
+  --bg: #16171d;
+  --fg: #f3f4f6;
+  --muted: #9ca3af;
+  --line: #2e303a;
+  --hover: #1f2028;
+  --accent: #60a5fa;
+  --accent-hover: #93c5fd;
+  --accent-fg: #0b1220;
+  --danger: #f87171;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-page: var(--bg);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-hover: var(--hover);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-fg: var(--accent-fg);
+  --color-danger: var(--danger);
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--fg);
+}

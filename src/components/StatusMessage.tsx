@@ -5,7 +5,7 @@ type StatusMessageProps =
 export default function StatusMessage(props: StatusMessageProps) {
   if (props.type === 'loading') {
     return (
-      <p role="status" className="p-4 text-gray-600">
+      <p role="status" className="p-4 text-muted">
         {props.message}
       </p>
     )
@@ -13,11 +13,11 @@ export default function StatusMessage(props: StatusMessageProps) {
 
   return (
     <div role="alert" className="p-4">
-      <p className="mb-2 text-red-600">{props.message}</p>
+      <p className="mb-2 text-danger">{props.message}</p>
       <button
         type="button"
         onClick={props.onRetry}
-        className="rounded border border-gray-300 px-3 py-1 hover:bg-gray-100 focus:outline-2 focus:outline-blue-600"
+        className="rounded border border-line px-3 py-1 hover:bg-hover focus:outline-2 focus:outline-accent"
       >
         Reintentar
       </button>

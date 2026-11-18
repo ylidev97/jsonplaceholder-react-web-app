@@ -7,7 +7,7 @@ interface PostFormProps {
 }
 
 const inputClass =
-  'w-full rounded border border-gray-300 px-3 py-2 focus:outline-2 focus:outline-blue-600'
+  'w-full rounded border border-line bg-page px-3 py-2 text-fg focus:outline-2 focus:outline-accent'
 
 export default function PostForm({ userId }: PostFormProps) {
   const [title, setTitle] = useState('')
@@ -57,7 +57,7 @@ export default function PostForm({ userId }: PostFormProps) {
           className={inputClass}
         />
         {titleError && (
-          <p id="post-title-error" role="alert" className="mt-1 text-sm text-red-600">
+          <p id="post-title-error" role="alert" className="mt-1 text-sm text-danger">
             {titleError}
           </p>
         )}
@@ -77,7 +77,7 @@ export default function PostForm({ userId }: PostFormProps) {
           className={inputClass}
         />
         {bodyError && (
-          <p id="post-body-error" role="alert" className="mt-1 text-sm text-red-600">
+          <p id="post-body-error" role="alert" className="mt-1 text-sm text-danger">
             {bodyError}
           </p>
         )}
@@ -86,7 +86,7 @@ export default function PostForm({ userId }: PostFormProps) {
       <button
         type="submit"
         disabled={isPending}
-        className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:outline-2 focus:outline-offset-2 focus:outline-blue-600 disabled:opacity-50"
+        className="rounded bg-accent px-4 py-2 text-accent-fg hover:bg-accent-hover focus:outline-2 focus:outline-offset-2 focus:outline-accent disabled:opacity-50"
       >
         {isPending ? 'Publicando…' : 'Publicar'}
       </button>
