@@ -36,4 +36,14 @@ describe('PostList', () => {
 
     expect(getPostsByUser).not.toHaveBeenCalled()
   })
+
+  it('R3: title and text start with a capital letter', async () => {
+    vi.mocked(getPostsByUser).mockResolvedValue([
+      { id: 1, userId: 1, title: 'lowercase title', body: 'lowercase body' },
+    ])
+    renderPostList(1)
+
+    expect(await screen.findByText('Lowercase title')).toBeInTheDocument()
+    expect(screen.getByText('Lowercase body')).toBeInTheDocument()
+  })
 })

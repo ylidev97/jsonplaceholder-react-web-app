@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import UserList from './components/UserList'
 import PostList from './components/PostList'
+import PostForm from './components/PostForm'
 
 function App() {
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null)
@@ -14,6 +15,7 @@ function App() {
         </div>
         <div className="w-2/3">
           <PostList userId={selectedUserId} />
+          <PostForm userId={selectedUserId} />
         </div>
       </div>
     </main>

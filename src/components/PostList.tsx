@@ -1,4 +1,5 @@
 import { usePosts } from '../hooks/usePosts'
+import { capitalize } from '../utils/capitalize'
 
 interface PostListProps {
   userId: number | null
@@ -14,8 +15,8 @@ export default function PostList({ userId }: PostListProps) {
       <ul className="space-y-4">
         {posts.map((post) => (
           <li key={post.id}>
-            <h3 className="font-semibold">{post.title}</h3>
-            <p className="text-gray-600">{post.body}</p>
+            <h3 className="font-semibold">{capitalize(post.title)}</h3>
+            <p className="text-gray-600">{capitalize(post.body)}</p>
           </li>
         ))}
       </ul>
